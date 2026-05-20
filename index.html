@@ -15,6 +15,7 @@
             --shadow-color: rgba(0,0,0,0.3);
             --btn-tone-bg: #333333;
             --btn-tone-active: #ff9f43;
+            --input-bg: #252525;
         }
 
         [data-theme="light"] {
@@ -27,6 +28,7 @@
             --shadow-color: rgba(0,0,0,0.1);
             --btn-tone-bg: #e0e0e0;
             --btn-tone-active: #e67e22;
+            --input-bg: #ffffff;
         }
 
         body { 
@@ -39,13 +41,32 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
+        /* Estrutura do topo para alinhar busca, seletor e tema */
         .topo-container {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column;
             max-width: 440px; 
             margin: 0 auto 10px auto;
             gap: 10px;
+        }
+
+        .linha-controles {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            font-size: 15px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--select-border);
+            border-radius: 6px;
+            transition: all 0.3s;
         }
 
         select { 
@@ -56,7 +77,7 @@
             color: var(--text-color); 
             border: 1px solid var(--select-border); 
             border-radius: 6px; 
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+            transition: all 0.3s;
         }
 
         .theme-toggle {
@@ -71,7 +92,7 @@
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+            transition: all 0.3s;
             flex-shrink: 0;
         }
 
@@ -101,8 +122,10 @@
             color: #141414;
         }
 
+        /* Modificado para fonte monoespaçada com bordas mais grossas (bold) */
         pre { 
             font-family: 'Courier New', Courier, monospace; 
+            font-weight: bold; /* Deixa as bordas de todo o texto mais grossas */
             font-size: 16px; 
             line-height: 1.2; 
             overflow-x: auto; 
@@ -119,7 +142,7 @@
 
         .acorde {
             color: var(--acorde-color) !important; 
-            font-weight: bold !important; 
+            font-weight: 900 !important; /* Força o negrito ultra grosso no acorde */
             transition: color 0.3s;
         }
     </style>
@@ -127,13 +150,18 @@
 <body>
 
     <div class="topo-container">
-        <select id="seletor-musica" onchange="atualizarOpcoesDeTom()">
-            <option value="">-- Carregando músicas... --</option>
-        </select>
+        <!-- Campo de busca por texto -->
+        <input type="text" id="campo-busca" placeholder="Digite para buscar uma música..." oninput="filtrarMusicas()">
         
-        <button class="theme-toggle" id="btn-tema" onclick="alternarTema()">
-            🌙
-        </button>
+        <div class="linha-controles">
+            <select id="seletor-musica" onchange="atualizarOpcoesDeTom()">
+                <option value="">-- Carregando músicas... --</option>
+            </select>
+            
+            <button class="theme-toggle" id="btn-tema" onclick="alternarTema()">
+                🌙
+            </button>
+        </div>
     </div>
 
     <div class="tons-container" id="container-tons"></div>
@@ -142,6 +170,7 @@
 
     <script>
         let bancoMusicas = []; 
+        let listaNomesUnicos = []; // Guarda a lista global de nomes para a busca
 
         function alternarTema() {
             const html = document.documentElement;
@@ -155,39 +184,13 @@
             }
         }
 
-        // Função corrigida e otimizada para identificar linhas de acordes com precisão
-        function colorirAcordes(texto) {
-            const linhas = texto.split('\n');
-            const linhasConvertidas = linhas.map(linha => {
-                const linhaTrimmed = linha.trim();
-                if (linhaTrimmed === '') return linha;
-
-                // Se a linha original começa com espaço ou tabulação, tem alta chance de ser cifra
-                const comecaComEspaco = linha.startsWith(' ') || linha.startsWith('\t');
-
-                // Quebra a linha por sequências de espaços para testar cada bloco isolado
-                const blocos = linhaTrimmed.split(/\s+/);
-                
-                // Padrão rigoroso para identificar apenas estruturas de acordes legítimos
-                const padraoAcorde = /^([A-G][#b]?(m|M|min|maj|dim|aug|°|º)?\d*(maj7|maj9|min7|m7|m9|m7b5|dim7|sus2|sus4)?(\/[A-G][#b]?)?|\|)$/;
-
-                let todosSaoAcordes = true;
-                for (let bloco of blocos) {
-                    if (bloco.length > 0 && !bloco.match(padraoAcorde)) {
-                        todosSaoAcordes = false;
-                        break;
-                    }
-                }
-
-                // Pinta os acordes apenas se todos os blocos passarem no teste ou se houver espaçamento inicial nítido
-                if (todosSaoAcordes || (comecaComEspaco && blocos.length <= 5)) {
-                    const regexSubstituição = /(?<![a-zA-Zá-úÁ-Ú])([A-G][#b]?(m|M|min|maj|dim|aug|°|º)?(2|4|5|6|7|9|11|13)?(M)?(sus2|sus4|add9)?(\/[A-G][#b]?)?)(?![a-zA-Zá-úÁ-Ú])/g;
-                    return linha.replace(regexSubstituição, match => `<span class="acorde">${match}</span>`);
-                }
-                
-                return linha;
+        /* NOVA REGRA MANUAL: Encontra tudo entre "" e envelopa na tag de acorde, removendo as aspas */
+        function formatarCifraManual(texto) {
+            // Captura tudo o que estiver entre aspas duplas, ex: "A/C#"
+            const regexAspas = /"([^"]+)"/g;
+            return texto.replace(regexAspas, (match, acorde) => {
+                return `<span class="acorde">${acorde}</span>`;
             });
-            return linhasConvertidas.join('\n');
         }
 
         async function iniciar() {
@@ -214,14 +217,8 @@
                     nomesUnicos.add(nome.trim());
                 });
                 
-                seletor.innerHTML = '<option value="">-- Escolha uma cifra --</option>';
-                nomesUnicos.forEach(nome => {
-                    const option = document.createElement('option');
-                    option.value = nome;
-                    option.textContent = nome;
-                    seletor.appendChild(option);
-                });
-
+                listaNomesUnicos = Array.from(nomesUnicos);
+                renderizarSeletor(listaNomesUnicos);
                 verificarParametrosURL();
 
             } catch (erro) {
@@ -229,18 +226,52 @@
             }
         }
 
-        // NOVO: decodifica o texto recebido na URL eliminando problemas com caracteres como %20
+        // Desenha as opções no menu Select
+        function renderizarSeletor(listaDeNomes) {
+            const seletor = document.getElementById('seletor-musica');
+            seletor.innerHTML = '<option value="">-- Escolha uma cifra --</option>';
+            
+            listaDeNomes.forEach(nome => {
+                const option = document.createElement('option');
+                option.value = nome;
+                option.textContent = nome;
+                seletor.appendChild(option);
+            });
+        }
+
+        /* NOVO: Filtra as opções do seletor conforme você digita no campo de busca */
+        function filtrarMusicas() {
+            const termoBusca = document.getElementById('campo-busca').value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+            const seletor = document.getElementById('seletor-musica');
+            
+            // Filtra ignorando acentos e maiúsculas
+            const nomesFiltrados = listaNomesUnicos.filter(nome => {
+                const nomeLimpo = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+                return nomeLimpo.includes(termoBusca);
+            });
+
+            renderizarSeletor(nomesFiltrados);
+
+            // Se sobrar apenas 1 música no filtro, já seleciona ela automaticamente
+            if (nomesFiltrados.length === 1) {
+                seletor.value = nomesFiltrados[0];
+                atualizarOpcoesDeTom();
+            } else {
+                document.getElementById('container-tons').innerHTML = '';
+                document.getElementById('conteudo-cifra').style.display = 'none';
+            }
+        }
+
         function verificarParametrosURL() {
             const parametros = new URLSearchParams(window.location.search);
             const musicaLink = parametros.get('musica');
             const tomLink = parametros.get('tom');
 
             if (musicaLink) {
-                // Decodifica o texto para converter "%20" de volta em espaço normal
                 const musicaDecodificada = decodeURIComponent(musicaLink).trim();
                 const seletor = document.getElementById('seletor-musica');
                 
-                if (Array.from(seletor.options).some(option => option.value === musicaDecodificada)) {
+                if (listaNomesUnicos.includes(musicaDecodificada)) {
                     seletor.value = musicaDecodificada;
                     atualizarOpcoesDeTom(tomLink ? decodeURIComponent(tomLink).trim() : null); 
                 }
@@ -290,7 +321,9 @@
                 if (!resposta.ok) throw new Error();
                 
                 const textoOriginal = await resposta.text();
-                areaCifra.innerHTML = colorirAcordes(textoOriginal);
+                
+                // CHAMA A FORMATAÇÃO MANUAL AQUI
+                areaCifra.innerHTML = formatarCifraManual(textoOriginal);
                 areaCifra.style.display = 'block';
             } catch (erro) {
                 areaCifra.textContent = "Erro ao carregar o texto da cifra.";
