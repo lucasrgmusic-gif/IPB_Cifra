@@ -44,11 +44,11 @@
                     if (arquivo.name.endsWith('.txt')) {
                         const option = document.createElement('option');
                         // Remove o ".txt" do nome para exibir um título limpo na tela
-                        const nomeLimpo = arquivo.name.replace('.txt', '').replace(/-/g, ' ');
-                        
-                        option.value = arquivo.download_url; // Link direto do conteúdo bruto
-                        option.textContent = nomeLimpo;
-                        seletor.appendChild(option);
+                        const nomeLimpo = arquivo.name.replace('.txt', '');
+    
+    option.value = arquivo.download_url; // Link correto do conteúdo
+    option.textContent = nomeLimpo;
+    seletor.appendChild(option);
                     }
                 });
             } catch (erro) {
