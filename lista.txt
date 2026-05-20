@@ -1,2 +1,2 @@
-cifras/AlfaeOmega-AsaphBorba-A.txt:Alfa e Ômega - Asaph Borba:A:24
+cifras/AlfaeOmega-AsaphBorba-A.txt:Alfa e Ômega - Asaph Borba:A
 cifras/AlfaeOmega-AsaphBorba-XA.txt:Alfa e Ômega - Asaph Borba:XA
