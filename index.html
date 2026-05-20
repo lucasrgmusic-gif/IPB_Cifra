@@ -5,90 +5,133 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IPB Cifras</title>
     <style>
+        /* Variáveis de cor para alternar os temas facilmente */
+        :root {
+            --bg-color: #141414;
+            --container-bg: #1a1a1a;
+            --text-color: #ffffff;
+            --select-bg: #252525;
+            --select-border: #444444;
+            --acorde-color: #ff9f43;
+            --shadow-color: rgba(0,0,0,0.3);
+        }
+
+        /* Tema Claro */
+        [data-theme="light"] {
+            --bg-color: #f5f5f5;
+            --container-bg: #ffffff;
+            --text-color: #222222;
+            --select-bg: #ffffff;
+            --select-border: #cccccc;
+            --acorde-color: #e67e22; /* Laranja um pouco mais escuro para dar contraste no fundo branco */
+            --shadow-color: rgba(0,0,0,0.1);
+        }
+
         body { 
-            background-color: #141414; 
-            color: #ffffff; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
             font-family: Arial, sans-serif; 
             padding: 20px; 
             max-width: 800px; 
             margin: 0 auto; 
+            transition: background-color 0.3s, color 0.3s;
         }
+
+        /* Container do topo que alinha o seletor mais curto e o botão de tema */
+        .topo-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 440px; /* Encurtou a barra deixando espaço para o botão */
+            margin: 0 auto 20px auto;
+            gap: 10px;
+        }
+
         select { 
-            width: 100%; 
+            flex-grow: 1;
             padding: 12px; 
-            font-size: 16px; 
-            background-color: #252525; 
-            color: white; 
-            border: 1px solid #444; 
+            font-size: 15px; 
+            background-color: var(--select-bg); 
+            color: var(--text-color); 
+            border: 1px solid var(--select-border); 
             border-radius: 6px; 
-            margin-bottom: 20px; 
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
-        /* Ajuste de tamanho idêntico ao seu print */
+
+        /* Botão alternador de tema circular */
+        .theme-toggle {
+            background-color: var(--select-bg);
+            border: 1px solid var(--select-border);
+            color: var(--text-color);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+            flex-shrink: 0;
+        }
+
+        /* Caixa de exibição da cifra */
         pre { 
             font-family: 'Courier New', Courier, monospace; 
             font-size: 16px; 
-            line-height: 1.7; 
+            line-height: 1.2; 
             overflow-x: auto; 
             white-space: pre; 
-            background-color: #1a1a1a; 
+            background-color: var(--container-bg); 
             padding: 20px; 
             border-radius: 6px; 
-            max-width: 480px; /* Limita exatamente a largura da caixa de texto */
-            margin: 0 auto; /* Centraliza a caixa da cifra na tela */
+            max-width: 440px; /* Acompanha o tamanho mais curto do topo */
+            margin: 0 auto; 
             display: none; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px var(--shadow-color);
+            transition: background-color 0.3s, box-shadow 0.3s;
         }
-        /* Estilo automático dos acordes (Estilo Cifra Club) */
+
         .acorde {
-            color: #ff9f43; /* Laranja suave para melhor leitura */
-            font-weight: bold; /* Negrito */
+            color: var(--acorde-color) !important; 
+            font-weight: bold !important; 
+            transition: color 0.3s;
         }
     </style>
 </head>
 <body>
 
-    <h2 style="text-align: center; max-width: 480px; margin: 0 auto 15px auto;">Selecione a Música:</h2>
-    
-    <div style="max-width: 480px; margin: 0 auto;">
+    <!-- Topo sem a mensagem e com os elementos encurtados/alinhados -->
+    <div class="topo-container">
         <select id="seletor-musica" onchange="carregarCifra()">
             <option value="">-- Carregando músicas... --</option>
         </select>
+        
+        <button class="theme-toggle" id="btn-tema" onclick="alternarTema()" title="Alternar tema">
+            🌙 <!-- Ícone inicial (Lua para o modo escuro padrão) -->
+        </button>
     </div>
 
     <pre id="conteudo-cifra"></pre>
 
     <script>
-        // Função inteligente que identifica e colore os acordes automaticamente
-        function colorirAcordes(texto) {
-            // Expressão regular que identifica padrões de acordes musicais (A-G, sustenidos, bemóis, menores, com sétima, invertidos, etc)
-            const regexAcordes = /\b([A-G][#b]?(m|min|maj|dim|aug)?(2|4|5|6|7|9|11|13)?(maj7|maj9|min7|m7|m9|m7b5|dim7|sus2|sus4)?(\/[A-G][#b]?)?)(?=\s|$)/g;
+        // Função para alternar o tema e o ícone
+        function alternarTema() {
+            const html = document.documentElement;
+            const btn = document.getElementById('btn-tema');
             
-            const linhas = texto.split('\n');
-            const linhasConvertidas = linhas.map(linha => {
-                // Se a linha tiver mais letras normais e espaços longos do que palavras longas, o código entende como linha de acorde
-                const palavras = linha.trim().split(/\s+/);
-                let ehLinhaDeAcorde = true;
+            if (html.getAttribute('data-theme') === 'light') {
+                html.removeAttribute('data-theme');
+                btn.textContent = '🌙';
+            } else {
+                html.setAttribute('data-theme', 'light');
+                btn.textContent = '☀️';
+            }
+        }
 
-                if (palavras.length === 0 || linha.trim() === '') {
-                    ehLinhaDeAcorde = false;
-                } else {
-                    for (let p of palavras) {
-                        // Se uma palavra não bater com a regra de acordes, remove a propriedade da linha
-                        if (p.length > 0 && !p.match(/^([A-G][#b]?(m|M|dim|aug|sus|add)?\d*(\/[A-G][#b]?)?|\||\d|v|x)$/)) {
-                            ehLinhaDeAcorde = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (ehLinhaDeAcorde) {
-                    // Substitui os textos dos acordes pela tag HTML com classe CSS laranja
-                    return linha.replace(/\b[A-G][#b]?[^\s]*\/?[A-G]?[#b]?\b/g, match => `<span class="acorde">${match}</span>`);
-                }
-                return linha;
-            });
-
-            return linhasConvertidas.join('\n');
+        function colorirAcordes(texto) {
+            const regexAcordeCompleto = /(?<![a-zA-Zá-úÁ-Ú])([A-G][#b]?(m|M|min|maj|dim|aug|°|º)?(2|4|5|6|7|9|11|13)?(M)?(sus2|sus4|add9)?(\/[A-G][#b]?)?)(?![a-zA-Zá-úÁ-Ú])/g;
+            return texto.replace(regexAcordeCompleto, match => `<span class="acorde">${match}</span>`);
         }
 
         async function iniciar() {
@@ -128,11 +171,7 @@
                 if (!resposta.ok) throw new Error();
                 
                 const textoOriginal = await resposta.text();
-                
-                // Aplica a formatação automática antes de jogar na tela
-                const textoComCores = colorirAcordes(textoOriginal);
-                
-                areaCifra.innerHTML = textoComCores;
+                areaCifra.innerHTML = colorirAcordes(textoOriginal);
                 areaCifra.style.display = 'block';
             } catch (erro) {
                 areaCifra.textContent = "Erro ao carregar o texto da cifra.";
