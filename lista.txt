@@ -1,1 +1,1 @@
-cifras/AlfaeOmega-AsaphBorba-A.txt:Alfa e Ômega - Asaph Borba em Lá Maior (A)
+cifras/AlfaeOmega-AsaphBorba-A.txt:Alfa e Ômega - Asaph Borba:A
