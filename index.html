@@ -75,7 +75,6 @@
             flex-shrink: 0;
         }
 
-        /* Container para os botões de seleção de tom */
         .tons-container {
             display: flex;
             flex-wrap: wrap;
@@ -137,13 +136,12 @@
         </button>
     </div>
 
-    <!-- Área onde os botões de tom aparecerão -->
     <div class="tons-container" id="container-tons"></div>
 
     <pre id="conteudo-cifra"></pre>
 
     <script>
-        let bancoMusicas = []; // Guarda a lista estruturada de músicas
+        let bancoMusicas = []; 
 
         function alternarTema() {
             const html = document.documentElement;
@@ -157,16 +155,13 @@
             }
         }
 
-        // Lógica inteligente que colore acordes e ignora inícios de frase falados
         function colorirAcordes(texto) {
             const linhas = texto.split('\n');
             const linhasConvertidas = linhas.map(linha => {
-                // Se a linha tem texto mas começa com um espaço em branco, ela é puramente de cifra
-                if (linha.length > 0 && (linha.startsWith(' ') || linha.startsWith('\t'))) {
+                if (linha.length > 0 && (linha.startsWith(' ') || line.startsWith('\t'))) {
                     const regexAcordeCompleto = /(?<![a-zA-Zá-úÁ-Ú])([A-G][#b]?(m|M|min|maj|dim|aug|°|º)?(2|4|5|6|7|9|11|13)?(M)?(sus2|sus4|add9)?(\/[A-G][#b]?)?)(?![a-zA-Zá-úÁ-Ú])/g;
                     return linha.replace(regexAcordeCompleto, match => `<span class="acorde">${match}</span>`);
                 }
-                // Se a linha começa encostada na margem esquerda, presume-se que é letra do hino
                 return linha;
             });
             return linhasConvertidas.join('\n');
@@ -178,7 +173,7 @@
                 const resposta = await fetch('lista.txt');
                 if (!resposta.ok) throw new Error();
                 
-                const texto = await fetch('lista.txt').then(r => r.text());
+                const texto = await resposta.text();
                 const linhas = texto.split('\n');
                 
                 bancoMusicas = [];
@@ -203,13 +198,32 @@
                     option.textContent = nome;
                     seletor.appendChild(option);
                 });
+
+                // NOVO: Checa se existem parâmetros na URL para abrir direto
+                verificarParametrosURL();
+
             } catch (erro) {
                 seletor.innerHTML = '<option value="">Erro ao carregar a lista</option>';
             }
         }
 
-        // Cria os botões de tom baseados na música escolhida no seletor
-        function atualizarOpcoesDeTom() {
+        // NOVO: Lê os dados do link e faz a seleção automática
+        function verificarParametrosURL() {
+            const parametros = new URLSearchParams(window.location.search);
+            const musicaLink = parametros.get('musica');
+            const tomLink = parametros.get('tom');
+
+            if (musicaLink) {
+                const seletor = document.getElementById('seletor-musica');
+                // Se a música existir na lista, seleciona ela
+                if (Array.from(seletor.options).some(option => option.value === musicaLink)) {
+                    seletor.value = musicaLink;
+                    atualizarOpcoesDeTom(tomLink); // Passa o tom do link se houver
+                }
+            }
+        }
+
+        function atualizarOpcoesDeTom(tomPreSelecionado = null) {
             const nomeSelecionado = document.getElementById('seletor-musica').value;
             const containerTons = document.getElementById('container-tons');
             const areaCifra = document.getElementById('conteudo-cifra');
@@ -219,26 +233,31 @@
 
             if (!nomeSelecionado) return;
 
-            // Filtra todas as variações dessa mesma música
             const variacoes = bancoMusicas.filter(m => m.nome === nomeSelecionado);
+            let botaoParaClicar = null;
 
             variacoes.forEach((versao, index) => {
                 const btn = document.createElement('button');
                 btn.className = 'btn-tom';
-                btn.textContent = versao.tom;
+                btn.textContent = verasao = versao.tom;
                 btn.onclick = () => {
-                    // Remove destaque dos outros botões de tom
                     document.querySelectorAll('.btn-tom').forEach(b => b.classList.remove('ativo'));
                     btn.classList.add('ativo');
                     carregarCifra(versao.caminho);
                 };
                 containerTons.appendChild(btn);
                 
-                // Abre o primeiro tom disponível automaticamente
-                if (index === 0) {
-                    btn.click();
+                // Define qual botão deve ser clicado ao carregar
+                if (tomPreSelecionado && versao.tom.toLowerCase() === tomPreSelecionado.toLowerCase()) {
+                    botaoParaClicar = btn;
+                } else if (!botaoParaClicar && index === 0) {
+                    botaoParaClicar = btn;
                 }
             });
+
+            if (botaoParaClicar) {
+                botaoParaClicar.click();
+            }
         }
 
         async function carregarCifra(caminhoArquivo) {
