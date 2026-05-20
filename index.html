@@ -79,7 +79,6 @@
             transition: all 0.3s;
         }
 
-        /* Botões redondos de controle (tema e tamanho) */
         .btn-controle {
             background-color: var(--select-bg);
             border: 1px solid var(--select-border);
@@ -123,11 +122,10 @@
             color: #141414;
         }
 
-        /* Fonte alterada para 20px por padrão */
         pre { 
             font-family: 'Courier New', Courier, monospace; 
             font-weight: bold; 
-            font-size: 20px; /* Padrão 20px solicitado */
+            font-size: 20px; 
             line-height: 1.2; 
             overflow-x: auto; 
             white-space: pre; 
@@ -174,7 +172,6 @@
                 <option value="">-- Carregando músicas... --</option>
             </select>
             
-            <!-- Botões de controle de tamanho e tema alinhados lateralmente -->
             <button class="btn-controle" onclick="alterarTamanhoFonte(-2)" title="Diminuir letra">A-</button>
             <button class="btn-controle" onclick="alterarTamanhoFonte(2)" title="Aumentar letra">A+</button>
             <button class="btn-controle" id="btn-tema" onclick="alternarTema()">🌙</button>
@@ -188,7 +185,7 @@
     <script>
         let bancoMusicas = []; 
         let listaNomesUnicos = []; 
-        let tamanhoAtualFonte = 20; // Controla o estado do tamanho da fonte
+        let tamanhoAtualFonte = 20; 
 
         function alternarTema() {
             const html = document.documentElement;
@@ -202,12 +199,10 @@
             }
         }
 
-        // Função para alterar o tamanho do texto dinamicamente
         function alterarTamanhoFonte(mudanca) {
             const areaCifra = document.getElementById('conteudo-cifra');
             tamanhoAtualFonte += mudanca;
             
-            // Impede que a fonte fique ridiculamente pequena ou gigante
             if (tamanhoAtualFonte < 12) tamanhoAtualFonte = 12;
             if (tamanhoAtualFonte > 40) tamanhoAtualFonte = 40;
             
@@ -235,12 +230,13 @@
                 
                 linhas.forEach(linha => {
                     if (linha.trim() === '') return;
-                    const [caminho, nome, tom] = linha.split(':');
+                    const [caminho, nome, tom, tamanho] = linha.split(':');
                     
                     bancoMusicas.push({
                         caminho: caminho.trim(),
                         nome: nome.trim(),
-                        tom: tom ? tom.trim() : 'Padrão'
+                        tom: tom ? tom.trim() : 'Padrão',
+                        tamanho: tamanho && !isNaN(tamanho) ? parseInt(tamanho.trim()) : 20 // NOVO: Guarda o tamanho personalizado ou define 20
                     });
                     nomesUnicos.add(nome.trim());
                 });
@@ -322,7 +318,7 @@
                 btn.onclick = () => {
                     document.querySelectorAll('.btn-tom').forEach(b => b.classList.remove('ativo'));
                     btn.classList.add('ativo');
-                    carregarCifra(versao.caminho);
+                    carregarCifra(versao.caminho, versao.tamanho); // NOVO: Passa o tamanho da cifra selecionada
                 };
                 containerTons.appendChild(btn);
                 
@@ -338,7 +334,8 @@
             }
         }
 
-        async function carregarCifra(caminhoArquivo) {
+        // NOVO: A função agora recebe o tamanho vindo da lista do banco
+        async function carregarCifra(caminhoArquivo, tamanhoFonteMusica) {
             const areaCifra = document.getElementById('conteudo-cifra');
             try {
                 const resposta = await fetch(caminhoArquivo);
@@ -346,6 +343,11 @@
                 
                 const textoOriginal = await resposta.text();
                 areaCifra.innerHTML = formatarCifraManual(textoOriginal);
+                
+                // NOVO: Aplica o tamanho personalizado da música atual na tela
+                tamanhoAtualFonte = tamanhoFonteMusica;
+                areaCifra.style.fontSize = tamanhoAtualFonte + 'px';
+                
                 areaCifra.style.display = 'block';
             } catch (erro) {
                 areaCifra.textContent = "Erro ao carregar o texto da cifra.";
