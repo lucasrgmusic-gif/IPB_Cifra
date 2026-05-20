@@ -155,13 +155,36 @@
             }
         }
 
+        // Função corrigida e otimizada para identificar linhas de acordes com precisão
         function colorirAcordes(texto) {
             const linhas = texto.split('\n');
             const linhasConvertidas = linhas.map(linha => {
-                if (linha.length > 0 && (linha.startsWith(' ') || linha.startsWith('\t'))) {
-                    const regexAcordeCompleto = /(?<![a-zA-Zá-úÁ-Ú])([A-G][#b]?(m|M|min|maj|dim|aug|°|º)?(2|4|5|6|7|9|11|13)?(M)?(sus2|sus4|add9)?(\/[A-G][#b]?)?)(?![a-zA-Zá-úÁ-Ú])/g;
-                    return linha.replace(regexAcordeCompleto, match => `<span class="acorde">${match}</span>`);
+                const linhaTrimmed = linha.trim();
+                if (linhaTrimmed === '') return linha;
+
+                // Se a linha original começa com espaço ou tabulação, tem alta chance de ser cifra
+                const comecaComEspaco = linha.startsWith(' ') || linha.startsWith('\t');
+
+                // Quebra a linha por sequências de espaços para testar cada bloco isolado
+                const blocos = linhaTrimmed.split(/\s+/);
+                
+                // Padrão rigoroso para identificar apenas estruturas de acordes legítimos
+                const padraoAcorde = /^([A-G][#b]?(m|M|min|maj|dim|aug|°|º)?\d*(maj7|maj9|min7|m7|m9|m7b5|dim7|sus2|sus4)?(\/[A-G][#b]?)?|\|)$/;
+
+                let todosSaoAcordes = true;
+                for (let bloco of blocos) {
+                    if (bloco.length > 0 && !bloco.match(padraoAcorde)) {
+                        todosSaoAcordes = false;
+                        break;
+                    }
                 }
+
+                // Pinta os acordes apenas se todos os blocos passarem no teste ou se houver espaçamento inicial nítido
+                if (todosSaoAcordes || (comecaComEspaco && blocos.length <= 5)) {
+                    const regexSubstituição = /(?<![a-zA-Zá-úÁ-Ú])([A-G][#b]?(m|M|min|maj|dim|aug|°|º)?(2|4|5|6|7|9|11|13)?(M)?(sus2|sus4|add9)?(\/[A-G][#b]?)?)(?![a-zA-Zá-úÁ-Ú])/g;
+                    return linha.replace(regexSubstituição, match => `<span class="acorde">${match}</span>`);
+                }
+                
                 return linha;
             });
             return linhasConvertidas.join('\n');
@@ -206,16 +229,20 @@
             }
         }
 
+        // NOVO: decodifica o texto recebido na URL eliminando problemas com caracteres como %20
         function verificarParametrosURL() {
             const parametros = new URLSearchParams(window.location.search);
             const musicaLink = parametros.get('musica');
             const tomLink = parametros.get('tom');
 
             if (musicaLink) {
+                // Decodifica o texto para converter "%20" de volta em espaço normal
+                const musicaDecodificada = decodeURIComponent(musicaLink).trim();
                 const seletor = document.getElementById('seletor-musica');
-                if (Array.from(seletor.options).some(option => option.value === musicaLink)) {
-                    seletor.value = musicaLink;
-                    atualizarOpcoesDeTom(tomLink); 
+                
+                if (Array.from(seletor.options).some(option => option.value === musicaDecodificada)) {
+                    seletor.value = musicaDecodificada;
+                    atualizarOpcoesDeTom(tomLink ? decodeURIComponent(tomLink).trim() : null); 
                 }
             }
         }
@@ -236,7 +263,7 @@
             variacoes.forEach((versao, index) => {
                 const btn = document.createElement('button');
                 btn.className = 'btn-tom';
-                btn.textContent = versao.tom; // Linha corrigida aqui!
+                btn.textContent = versao.tom;
                 btn.onclick = () => {
                     document.querySelectorAll('.btn-tom').forEach(b => b.classList.remove('ativo'));
                     btn.classList.add('ativo');
