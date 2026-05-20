@@ -1,1 +1,2 @@
 cifras/AlfaeOmega-AsaphBorba-A.txt:Alfa e Ômega - Asaph Borba:A
+cifras/AlfaeOmega-AsaphBorba-B.txt:Alfa e Ômega - Asaph Borba:B
