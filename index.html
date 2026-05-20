@@ -15,66 +15,59 @@
     <h2>Selecione a Música:</h2>
     
     <select id="seletor-musica" onchange="carregarCifra()">
-        <option value="">-- Carregando músicas da pasta... --</option>
+        <option value="">-- Carregando músicas... --</option>
     </select>
 
     <pre id="conteudo-cifra"></pre>
 
     <script>
-        // CONFIGURAÇÃO: Altere com os seus dados do GitHub
-        const USUARIO = 'lucasrgmusic-gif'; 
-        const REPOSITORIO = 'IPB_Cifra';
-        const PASTA = 'cifras';
-
-        // Busca os arquivos da pasta automaticamente usando a API do GitHub
-        async function buscarMusicas() {
+        // Carrega a lista de músicas do arquivo lista.txt
+        async function iniciar() {
             const seletor = document.getElementById('seletor-musica');
-            const urlAPI = `https://github.com{USUARIO}/${REPOSITORIO}/contents/${PASTA}`;
-
             try {
-                const resposta = await fetch(urlAPI);
+                const resposta = await fetch('lista.txt');
                 if (!resposta.ok) throw new Error();
                 
-                const arquivos = await resposta.json();
+                const texto = await resposta.text();
+                const linhas = texto.split('\n');
                 
                 seletor.innerHTML = '<option value="">-- Escolha uma cifra --</option>';
                 
-                // Filtra apenas arquivos que terminam com .txt
-                arquivos.forEach(arquivo => {
-                    if (arquivo.name.endsWith('.txt')) {
-                        const option = document.createElement('option');
-                        // Remove o ".txt" do nome para exibir um título limpo na tela
-                        const nomeLimpo = arquivo.name.replace('.txt', '');
-    
-    option.value = arquivo.download_url; // Link correto do conteúdo
-    option.textContent = nomeLimpo;
-    seletor.appendChild(option);
-                    }
+                linhas.forEach(linha => {
+                    if (linha.trim() === '') return;
+                    const [caminhoArquivo, nomeExibicao] = linha.split(':');
+                    
+                    const option = document.createElement('option');
+                    option.value = caminhoArquivo.trim();
+                    option.textContent = nomeExibicao.trim();
+                    seletor.appendChild(option);
                 });
             } catch (erro) {
-                seletor.innerHTML = '<option value="">Erro ao carregar pasta ou pasta vazia</option>';
+                seletor.innerHTML = '<option value="">Erro ao carregar a lista de músicas</option>';
             }
         }
 
         async function carregarCifra() {
             const seletor = document.getElementById('seletor-musica');
-            const urlDownload = seletor.value;
+            const arquivo = seletor.value;
             const areaCifra = document.getElementById('conteudo-cifra');
 
-            if (!urlDownload) { areaCifra.style.display = 'none'; return; }
+            if (!arquivo) { areaCifra.style.display = 'none'; return; }
 
             try {
-                const resposta = await fetch(urlDownload);
+                const resposta = await fetch(arquivo);
+                if (!resposta.ok) throw new Error();
+                
                 const texto = await resposta.text();
                 areaCifra.textContent = texto;
                 areaCifra.style.display = 'block';
             } catch (erro) {
-                areaCifra.textContent = "Erro ao baixar o conteúdo da cifra.";
+                areaCifra.textContent = "Erro ao carregar o texto da cifra.";
                 areaCifra.style.display = 'block';
             }
         }
 
-        buscarMusicas();
+        iniciar();
     </script>
 </body>
 </html>
