@@ -158,7 +158,7 @@
         function colorirAcordes(texto) {
             const linhas = texto.split('\n');
             const linhasConvertidas = linhas.map(linha => {
-                if (linha.length > 0 && (linha.startsWith(' ') || line.startsWith('\t'))) {
+                if (linha.length > 0 && (linha.startsWith(' ') || linha.startsWith('\t'))) {
                     const regexAcordeCompleto = /(?<![a-zA-Zá-úÁ-Ú])([A-G][#b]?(m|M|min|maj|dim|aug|°|º)?(2|4|5|6|7|9|11|13)?(M)?(sus2|sus4|add9)?(\/[A-G][#b]?)?)(?![a-zA-Zá-úÁ-Ú])/g;
                     return linha.replace(regexAcordeCompleto, match => `<span class="acorde">${match}</span>`);
                 }
@@ -199,7 +199,6 @@
                     seletor.appendChild(option);
                 });
 
-                // NOVO: Checa se existem parâmetros na URL para abrir direto
                 verificarParametrosURL();
 
             } catch (erro) {
@@ -207,7 +206,6 @@
             }
         }
 
-        // NOVO: Lê os dados do link e faz a seleção automática
         function verificarParametrosURL() {
             const parametros = new URLSearchParams(window.location.search);
             const musicaLink = parametros.get('musica');
@@ -215,10 +213,9 @@
 
             if (musicaLink) {
                 const seletor = document.getElementById('seletor-musica');
-                // Se a música existir na lista, seleciona ela
                 if (Array.from(seletor.options).some(option => option.value === musicaLink)) {
                     seletor.value = musicaLink;
-                    atualizarOpcoesDeTom(tomLink); // Passa o tom do link se houver
+                    atualizarOpcoesDeTom(tomLink); 
                 }
             }
         }
@@ -239,7 +236,7 @@
             variacoes.forEach((versao, index) => {
                 const btn = document.createElement('button');
                 btn.className = 'btn-tom';
-                btn.textContent = verasao = versao.tom;
+                btn.textContent = versao.tom; // Linha corrigida aqui!
                 btn.onclick = () => {
                     document.querySelectorAll('.btn-tom').forEach(b => b.classList.remove('ativo'));
                     btn.classList.add('ativo');
@@ -247,7 +244,6 @@
                 };
                 containerTons.appendChild(btn);
                 
-                // Define qual botão deve ser clicado ao carregar
                 if (tomPreSelecionado && versao.tom.toLowerCase() === tomPreSelecionado.toLowerCase()) {
                     botaoParaClicar = btn;
                 } else if (!botaoParaClicar && index === 0) {
