@@ -35,13 +35,12 @@
             background-color: var(--bg-color); 
             color: var(--text-color); 
             font-family: Arial, sans-serif; 
-            padding: 20px; 
+            padding: 20px 10px; /* Reduzido o padding lateral do fundo */
             max-width: 800px; 
             margin: 0 auto; 
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Estrutura do topo para alinhar busca, seletor e tema */
         .topo-container {
             display: flex;
             flex-direction: column;
@@ -122,10 +121,9 @@
             color: #141414;
         }
 
-        /* Modificado para fonte monoespaçada com bordas mais grossas (bold) */
         pre { 
             font-family: 'Courier New', Courier, monospace; 
-            font-weight: bold; /* Deixa as bordas de todo o texto mais grossas */
+            font-weight: bold; 
             font-size: 16px; 
             line-height: 1.2; 
             overflow-x: auto; 
@@ -138,19 +136,35 @@
             display: none; 
             box-shadow: 0 4px 10px var(--shadow-color);
             transition: background-color 0.3s, box-shadow 0.3s;
+            box-sizing: border-box; /* Garante que o padding não estoure a tela */
         }
 
         .acorde {
             color: var(--acorde-color) !important; 
-            font-weight: 900 !important; /* Força o negrito ultra grosso no acorde */
+            font-weight: 900 !important; 
             transition: color 0.3s;
+        }
+
+        /* REGRA DE TELA DO CELULAR: Remove as bordas pretas laterais do bloco da cifra */
+        @media (max-width: 480px) {
+            body {
+                padding: 15px 0px; /* Zera o espaço nas laterais da página inteira */
+            }
+            .topo-container, .tons-container {
+                padding: 0 10px; /* Mantém os botões e busca ligeiramente afastados da borda */
+                box-sizing: border-box;
+            }
+            pre {
+                max-width: 100%; /* Força o bloco preto a encostar nas extremidades esquerda e direita */
+                border-radius: 0px; /* Remove o arredondamento para encaixar perfeitamente */
+                padding: 20px 10px; /* Deixa o texto com um recuo seguro dentro da caixa preta */
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="topo-container">
-        <!-- Campo de busca por texto -->
         <input type="text" id="campo-busca" placeholder="Digite para buscar uma música..." oninput="filtrarMusicas()">
         
         <div class="linha-controles">
@@ -170,7 +184,7 @@
 
     <script>
         let bancoMusicas = []; 
-        let listaNomesUnicos = []; // Guarda a lista global de nomes para a busca
+        let listaNomesUnicos = []; 
 
         function alternarTema() {
             const html = document.documentElement;
@@ -184,9 +198,7 @@
             }
         }
 
-        /* NOVA REGRA MANUAL: Encontra tudo entre "" e envelopa na tag de acorde, removendo as aspas */
         function formatarCifraManual(texto) {
-            // Captura tudo o que estiver entre aspas duplas, ex: "A/C#"
             const regexAspas = /"([^"]+)"/g;
             return texto.replace(regexAspas, (match, acorde) => {
                 return `<span class="acorde">${acorde}</span>`;
@@ -226,7 +238,6 @@
             }
         }
 
-        // Desenha as opções no menu Select
         function renderizarSeletor(listaDeNomes) {
             const seletor = document.getElementById('seletor-musica');
             seletor.innerHTML = '<option value="">-- Escolha uma cifra --</option>';
@@ -239,12 +250,10 @@
             });
         }
 
-        /* NOVO: Filtra as opções do seletor conforme você digita no campo de busca */
         function filtrarMusicas() {
             const termoBusca = document.getElementById('campo-busca').value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
             const seletor = document.getElementById('seletor-musica');
             
-            // Filtra ignorando acentos e maiúsculas
             const nomesFiltrados = listaNomesUnicos.filter(nome => {
                 const nomeLimpo = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
                 return nomeLimpo.includes(termoBusca);
@@ -252,7 +261,6 @@
 
             renderizarSeletor(nomesFiltrados);
 
-            // Se sobrar apenas 1 música no filtro, já seleciona ela automaticamente
             if (nomesFiltrados.length === 1) {
                 seletor.value = nomesFiltrados[0];
                 atualizarOpcoesDeTom();
@@ -321,8 +329,6 @@
                 if (!resposta.ok) throw new Error();
                 
                 const textoOriginal = await resposta.text();
-                
-                // CHAMA A FORMATAÇÃO MANUAL AQUI
                 areaCifra.innerHTML = formatarCifraManual(textoOriginal);
                 areaCifra.style.display = 'block';
             } catch (erro) {
