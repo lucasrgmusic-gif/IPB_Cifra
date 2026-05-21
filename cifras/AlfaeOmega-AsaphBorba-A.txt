@@ -1,14 +1,14 @@
 [Intro] A
 
-"A                Bm7   E7 "
+"A                 Bm7   E7 "
 Tu que estás assentado  
-  "   D   A"
+  "   D  A"
 No tro__no
-         " B7/A       B7   E7"
+         " B7/A       B7  E7"
 Sempre reinando, sobera__no
-         "Bm7      E7  "      
+         "Bm7    E7  "      
 Anjos cantando
-           "D   A/C#"
+           "D  A/C#"
 homens louvan__do
        "  B7                 E7"
 Deus reunido, com o seu po__vo
@@ -17,13 +17,14 @@ Deus reunido, com o seu po__vo
  Oh,   oh  Alfa,  Omega
 "F#m7    Em7    A7"
 Cristo, filho
-      " D7M Eb°       A/E  F#m"
+       " D7M  Eb°      A/E  F#m"
 Oh, oh, vem,   oh, oh vem
-        "Bm7      E7    A  "
-Oh, oh, vem, Senhor Jesus (2x)
+        "Bm7      E7    "
+Oh, oh, vem, Senhor Jesus "(2x)"
 
+[Passagem] "A D/A Dm/A A D/A A"
 
-"A         Bm7  E7        D   A/C#"
+"          Bm7  E7        D   A/C#"
 Ansioso espero,   a sua vol__ta
       "   B7               E7"
 O grande dia em que tu viras
