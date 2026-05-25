@@ -1,4 +1,4 @@
-[Intro] "A  Dm/A (3x)"
+[Intro] "A Dm/A  A Dm/A  A Dm/A"
         "A  F  G  A"
 
 "A                 Bm7   E7 "
@@ -7,8 +7,8 @@ Tu que estás assentado
 No tro__no
          " B7/A       B7  E"
 Sempre reinando, sobera__no
-         "Bm7    E  "      
-Anjos cantando
+"A        Bm7    E  "      
+     Anjos cantando
            "D  A/C#"
 homens louvan__do
        "  B7                 E7"
@@ -21,16 +21,14 @@ Cristo, filho
        " D7M  Eb°      A/E  F#m7"
 Oh, oh, vem,   oh, oh vem
         "Bm7      E7    A "
-Oh, oh, vem, Senhor Jesus "(2x)"
+Oh, oh, vem, Senhor Jesus 
 
-[Passagem] "A  D/A Dm/A  A  D/A  A"
-
-"          Bm7  E7        D   A/C#"
+"A         Bm7  E7        D   A/C#"
 Ansioso espero,   a sua vol__ta
       "   B7               E7"
 O grande dia em que tu viras
-      "     Bm7  E7"
-Então subiremos,  
+"A              Bm7  E7"
+    Então subiremos,  
          "    D  A/C#"
 Contigo estare__mos
    "   B7           E"
@@ -43,5 +41,14 @@ Filho, Mestre
        "D7M  Eb°      A/E  F#m7"
 Oh, oh, vem, oh, oh vem
         Bm      E     A
-Oh, oh, vem, Senhor Jesus "(2x)"
+Oh, oh, vem, Senhor Jesus
+
+"D/F#  E/G# D/A   A   G#m7   C#7/F"
+ Ma____ra___na___ta,  Cristo
+"F#m7  Em7    A7"
+Filho, Mestre
+       "D7M  Eb°      A/E  F#m7"
+Oh, oh, vem, oh, oh vem
+        Bm      E     A
+Oh, oh, vem, Senhor Jesus
 
