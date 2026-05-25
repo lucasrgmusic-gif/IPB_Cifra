@@ -1,8 +1,28 @@
-[PARTE 1] A Bm7   E7 D A B7/A      B7   E
-Bm7       E7        D  A/C# B7     E
+[INTRO]
+    "A |  Dm/A | A | Dm/A | A | Dm/A"
+    "A | F | G | A"
 
-[Refrão] D/F#  E/G# A     G#m7  C#7/F
-F#m7    Em7  A7
-D7M Ebº       A/E F#m
-Bm7      E7     A  
+[PARTE 1] 
+    "A | Bm7 | E7"
+    "D/A | A"
+    "B7/A | B7 | E7"
+    "A | Bm7 | E"
+    "D | A/C#"
+    "B7 | B7 | E7"
 
+[Refrão] 
+    "D/F# | E/G# | D/A | A"  
+    "G#m7 | C#7/F"
+    "F#m7 | Em7 | A"
+    "D7M | Eb° | A/E | F#m7
+    "Bm7 | E7 | A 
+
+[PARTE 2] 
+    "A | Bm7 | E7"
+    "D | A/C#"
+    "B7 | B7 | E7"
+    "A | Bm7 | E"
+    "D | A/C#"
+    "B7 | B7 | E7"
+
+Mapa: INTRO, PARTE 1, REFRÃO, PARTE 2, REFRÃO, REFRÃO
